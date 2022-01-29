@@ -1,8 +1,13 @@
+import os
+
+from PIL import Image
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
+from acquaintance.settings import MEDIA_ROOT
 from .models import Profile
+from .utils import add_watermark
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -36,4 +41,12 @@ class UserSerializer(serializers.ModelSerializer):
         user.profile.gender = profile_data['gender']
         user.profile.avatar = profile_data['avatar']
         user.save()
+
+        file_path_watermark = os.path.join(MEDIA_ROOT, "watermarks", "watermark.png")
+        if profile_data['avatar'] and os.path.exists(file_path_watermark):
+            img = Image.open(user.profile.avatar.path)
+            watermark = Image.open(os.path.join(MEDIA_ROOT, "watermarks", "watermark.png"))
+            result = add_watermark(img, watermark)
+            result.save(user.profile.avatar.path)
+
         return user

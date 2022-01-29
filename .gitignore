@@ -91,3 +91,5 @@ db.sqlite3
 app_users/migrations/
 
 .idea/
+
+/media/files
