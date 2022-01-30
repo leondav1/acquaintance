@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
+from django.utils.timezone import make_aware
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -47,6 +48,7 @@ def apikey(request):
                 break
         api_key, key = APIKey.objects.create_key(name=request.user.username)
         expires = datetime.now() + timedelta(days=90)
+        expires = make_aware(expires)
         api_key.expiry_date = expires
         api_key.save()
         return Response({'apikey': key, 'expires': expires}, status=status.HTTP_200_OK)
