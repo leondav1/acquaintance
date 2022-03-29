@@ -1,15 +1,18 @@
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
+from django.http import Http404
 from django.utils.timezone import make_aware
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_api_key.models import APIKey
 
-from app_users.serializers import UserSerializer
+from app_users.models import Match
+from app_users.serializers import UserSerializer, MatchAPIViewSerializer
 
 
 class UserCreateAPIView(generics.CreateAPIView):
@@ -52,3 +55,21 @@ def apikey(request):
         api_key.expiry_date = expires
         api_key.save()
         return Response({'apikey': key, 'expires': expires}, status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
+class MatchAPIView(APIView):
+    def get(self, request, profile_id):
+        user = User.objects.get(id=profile_id)
+        if user:
+            match = Match.objects.filter(user=request.user, match=profile_id)
+            if match:
+                return Response({'error': 'Record already exists'})
+            match = Match.objects.create(user=request.user, match=profile_id)
+            answer = Match.objects.filter(user=user, match=request.user.id)
+            serializer = MatchAPIViewSerializer(match)
+            if answer:
+                # TODO: Send email
+                return Response({'results': serializer.data, 'email': user.email, 'status': 'OK'})
+        return Response({'results': serializer.data, 'email': None, 'status': 'OK'})
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

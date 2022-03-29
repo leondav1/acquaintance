@@ -38,3 +38,8 @@ class UserAPIKey(AbstractAPIKey):
     def create_user_UserAPIKey(sender, instance, created, **kwargs):
         if created:
             UserAPIKey.objects.create_key(user=instance, name=instance.username)
+
+
+class Match(models.Model):
+    user = models.ForeignKey(User, unique=False, on_delete=models.CASCADE)
+    match = models.IntegerField()

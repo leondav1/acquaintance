@@ -6,7 +6,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 
 from acquaintance.settings import MEDIA_ROOT
-from .models import Profile
+from .models import Profile, Match
 from .utils import add_watermark
 
 
@@ -50,3 +50,10 @@ class UserSerializer(serializers.ModelSerializer):
             result.save(user.profile.avatar.path)
 
         return user
+
+
+class MatchAPIViewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Match
+        fields = ['user', 'match']
