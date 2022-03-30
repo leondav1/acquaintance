@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import Http404
+from django.core.mail import send_mass_mail, BadHeaderError
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils.timezone import make_aware
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
@@ -69,7 +71,15 @@ class MatchAPIView(APIView):
             answer = Match.objects.filter(user=user, match=request.user.id)
             serializer = MatchAPIViewSerializer(match)
             if answer:
-                # TODO: Send email
+                message1 = (f'Письмо от {request.user.email}',
+                            f'Вы понравились {request.user.first_name}! Почта участника: {request.user.email}',
+                            settings.DEFAULT_FROM_EMAIL,
+                            [user.email])
+                message2 = (f'Письмо от {request.user.email}',
+                            f'Вы понравились {user.first_name}! Почта участника: {user.email}',
+                            settings.DEFAULT_FROM_EMAIL,
+                            [request.user.email])
+                send_mass_mail((message1, message2), fail_silently=False)
                 return Response({'results': serializer.data, 'email': user.email, 'status': 'OK'})
         return Response({'results': serializer.data, 'email': None, 'status': 'OK'})
         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

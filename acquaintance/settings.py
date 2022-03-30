@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 try:
-    from .secret_key_file import SECRET_KEY
+    from .secret_key_file import SECRET_KEY, DEFAULT_FROM_EMAIL
 except ImportError:
     from django.utils.crypto import get_random_string
     SECRET_KEY = get_random_string(50, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
@@ -144,3 +144,5 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
