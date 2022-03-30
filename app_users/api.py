@@ -71,11 +71,11 @@ class MatchAPIView(APIView):
             answer = Match.objects.filter(user=user, match=request.user.id)
             serializer = MatchAPIViewSerializer(match)
             if answer:
-                message1 = (f'Письмо от {request.user.email}',
+                message1 = (f'Письмо от участника {request.user.first_name}',
                             f'Вы понравились {request.user.first_name}! Почта участника: {request.user.email}',
                             settings.DEFAULT_FROM_EMAIL,
                             [user.email])
-                message2 = (f'Письмо от {request.user.email}',
+                message2 = (f'Письмо от участника {user.first_name}',
                             f'Вы понравились {user.first_name}! Почта участника: {user.email}',
                             settings.DEFAULT_FROM_EMAIL,
                             [request.user.email])

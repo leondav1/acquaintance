@@ -93,3 +93,5 @@ app_users/migrations/
 .idea/
 
 /media/files
+/acquaintance/mail_settings.py
+/acquaintance/secret_key_file.py

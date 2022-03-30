@@ -21,12 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 try:
-    from .secret_key_file import SECRET_KEY, DEFAULT_FROM_EMAIL
+    from .secret_key_file import SECRET_KEY
 except ImportError:
     from django.utils.crypto import get_random_string
     SECRET_KEY = get_random_string(50, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
     with open(os.path.join(BASE_DIR, 'acquaintance', 'secret_key_file.py'), 'w') as key_file:
         key_file.write("SECRET_KEY = '{key}'".format(key=SECRET_KEY))
+
+try:
+    from .mail_settings import *
+except ImportError:
+    DEFAULT_FROM_EMAIL = 'admin@test.ru'
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -144,5 +150,3 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
 }
-
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
